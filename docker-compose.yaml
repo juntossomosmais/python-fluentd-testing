@@ -1,0 +1,10 @@
+version: "2.4"
+services:
+  tests:
+    build:
+      context: .
+    working_dir: /app
+    volumes:
+      - .:/app
+      - "./tests/resources/fluentd-setup/fluentd/etc:/fluentd/etc"
+      - "./tests/resources/fluentd-setup/result:/result"

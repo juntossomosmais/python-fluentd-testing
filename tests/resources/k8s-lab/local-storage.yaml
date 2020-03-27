@@ -1,0 +1,25 @@
+# https://kubernetes.io/blog/2018/04/13/local-persistent-volumes-beta/
+# https://kubernetes.io/blog/2019/04/04/kubernetes-1.14-local-persistent-volumes-ga/
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: example-local-pv
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Delete
+  hostPath:
+    path: "/tmp/my-tmp-pv-k8s"

@@ -1,0 +1,49 @@
+import json
+from contextlib import contextmanager
+from time import sleep
+
+from python_fluentd_testing.utils import delete_all_log_files_contained_in_the_folder
+from python_fluentd_testing.utils import execute_shell_command
+from python_fluentd_testing.utils import execute_system_command_and_does_not_await_its_execution
+from python_fluentd_testing.utils import try_to_get_log_as_json
+
+
+class EmitCommandCouldNotBeExecuted(Exception):
+    pass
+
+
+class NoOutputCouldBeExtractedException(Exception):
+    pass
+
+
+class FluentdEvaluator:
+    def __init__(self, config_file_location, folder_logs, output_file_name):
+        self.config_file_location = config_file_location
+        self.folder_logs = folder_logs
+        self.output_file_name = output_file_name
+
+        delete_all_log_files_contained_in_the_folder(self.folder_logs)
+
+    def emit_it_and_check_if_matches_with(self, fake_log_data: dict):
+        self.emit_data(fake_log_data)
+        result = try_to_get_log_as_json(self.output_file_name)
+        if not result:
+            raise NoOutputCouldBeExtractedException
+        return result["log"] == fake_log_data["log"]
+
+    @contextmanager
+    def initialize_fluent_daemon(self):
+        command = ["fluentd", "-c", f"/fluentd/etc/{self.config_file_location}"]
+        with execute_system_command_and_does_not_await_its_execution(command):
+            yield self
+
+    @staticmethod
+    def emit_data(fake_log_data):
+        tag = fake_log_data["tag"] if fake_log_data.get("tag") else None
+        send_to_fluentd_as_text = json.dumps(fake_log_data)
+        command = ["echo", f"'{send_to_fluentd_as_text}'", "|", "fluent-cat", tag]
+        _, stderr = execute_shell_command(command)
+        # Give some time to commit the data
+        sleep(1)
+        if stderr:
+            raise EmitCommandCouldNotBeExecuted(f"Command error: {command}")
