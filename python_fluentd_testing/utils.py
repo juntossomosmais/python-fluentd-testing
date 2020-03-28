@@ -69,5 +69,7 @@ def try_to_get_log_as_json(file_location: str, max_tries=3, await_in_seconds_bet
         line_as_json: dict = json.loads(line)
         if line_as_json.get("log"):
             return line_as_json
+        if attempts >= max_tries:
+            return
         sleep(await_in_seconds_between_tries)
         attempts += 1
