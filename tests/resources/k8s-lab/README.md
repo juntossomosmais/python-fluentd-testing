@@ -101,6 +101,8 @@ Interesting issues:
 
 - [Fluentd is skipping logs in kubernetes](https://github.com/fluent/fluentd-kubernetes-daemonset/issues/366)
 - [Fluentd not sending logs to ES after a pod restart](https://github.com/fluent/fluentd-kubernetes-daemonset/issues/338)
+- [JSON in 'log' field not parsed/exploded after migration from 0.12 to 1.2](https://github.com/fluent/fluentd/issues/2021)
+- [Nested JSON parsing stopped working with fluent/fluentd-kubernetes-daemonset:v0.12-debian-elasticsearch](https://github.com/fluent/fluentd/issues/2073)
 
 Docker images:
 
