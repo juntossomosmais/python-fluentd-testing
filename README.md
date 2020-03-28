@@ -4,6 +4,16 @@ Tired of testing fluentd and wasting lots of your precious time if manual integr
 
 Now you can easily test your configuration with this project!
 
+## Using remote-interpreter
+
+You can use `remote-interpreter` Docker Compose service as a remote interpreter. It's important that you use `python3` to execute your code.
+
+## Run all the tests
+
+Simply execute the following command:
+
+    docker-compose up integration-tests
+
 ## Testing with your K8S
 
 After you test your configuration, you can proceed to apply your setup to your production environment. Now if you are in a phase where you would like to see if your configuration run in your real environment, like K8S, then you need to do a full manual process.

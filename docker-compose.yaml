@@ -1,10 +1,20 @@
 version: "2.4"
 services:
-  tests:
+  remote-interpreter:
     build:
       context: .
     working_dir: /app
     volumes:
       - .:/app
-      - "./tests/resources/fluentd-setup/fluentd/etc:/fluentd/etc"
-      - "./tests/resources/fluentd-setup/result:/result"
+      - ./tests/resources/fluentd-setup/fluentd/etc:/fluentd/etc
+      - ./tests/resources/fluentd-setup/result:/result
+  integration-tests:
+    build:
+      context: .
+    working_dir: /app
+    volumes:
+      - .:/app
+      - ./tests/resources/fluentd-setup/fluentd/etc:/fluentd/etc
+      - ./tests/resources/fluentd-setup/result:/result
+    command: >
+      sh -c "pip3 install tox && python3 -m tox"
