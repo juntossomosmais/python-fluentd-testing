@@ -9,7 +9,6 @@ from typing import Optional
 
 
 def execute_shell_command(commands_list: List[str]):
-    # As it was not working with list, so shell=True is used as workaround
     commands_list = " ".join(commands_list)
     output = subprocess.Popen(commands_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     stdout, stderr = output.communicate()
@@ -51,7 +50,6 @@ def delete_all_log_files_contained_in_the_folder(folder_path: str):
 
 
 def last_line_from_some_file(file: str) -> Optional[str]:
-    # pathlib.Path(file).lstat().st_size
     with open(file, "r") as f:
         lines = f.read().splitlines()
         return lines[-1]
