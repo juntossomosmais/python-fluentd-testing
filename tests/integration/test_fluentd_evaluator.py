@@ -22,11 +22,12 @@ def run_fluentd_1():
 
 def test_should_emit_data(run_fluentd_1):
     abs_file_path = run_fluentd_1
-    sample_fake_log = {"log": "jafar", "tag": "jsm.something"}
-    FluentdEvaluator.emit_data(sample_fake_log)
+    sample_fake_log = {"log": "jafar"}
+    tag = "jsm.something"
+    FluentdEvaluator.emit_data(sample_fake_log, tag)
 
     result = try_to_get_log_as_json(abs_file_path)
     assert result is not None
     assert result["log"] == sample_fake_log["log"]
-    assert result["tag"] == sample_fake_log["tag"]
+    assert result["tag"] == tag
     assert bool(re.search(f"{str(date.today())}:\w{{2}}:\w{{2}}:\w{{2}}", result["date"]))

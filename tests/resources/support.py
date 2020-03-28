@@ -9,7 +9,8 @@ def absolute_path_fluentd_output_file(test_file):
     return folder, abs_path
 
 
-def try_to_remove_key_otherwise_return_it(your_dict, key):
-    your_dict: dict = copy.deepcopy(your_dict)
-    your_dict.pop(key, None)
+def try_to_remove_key_otherwise_return_it(your_dict, *keys):
+    your_dict = copy.deepcopy(your_dict)
+    for key in keys:
+        your_dict.pop(key, None)
     return your_dict

@@ -56,8 +56,10 @@ def last_line_from_some_file(file: str) -> Optional[str]:
 
 
 def erase_file_content(file_location: str):
-    with open(file_location, "r+") as f:
-        f.truncate(0)
+    folder = pathlib.Path(file_location)
+    if folder.exists():
+        with open(file_location, "r+") as f:
+            f.truncate(0)
 
 
 def try_to_get_log_as_json(file_location: str, max_tries=3, await_in_seconds_between_tries=1) -> Optional[dict]:
