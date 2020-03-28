@@ -1,6 +1,6 @@
 # Python Fluentd Testing
 
-Tired of testing fluentd and wasting lots of your precious time if manual integration tests? How about the lag it causes to your machine?
+Tired of testing fluentd and wasting lots of your precious time with manual integration tests? How about the lag it causes to your machine?
 
 Now you can easily test your configuration with this project!
 
