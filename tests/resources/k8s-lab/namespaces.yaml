@@ -1,0 +1,18 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: kube-logging
+
+---
+
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: development
+
+---
+
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: production

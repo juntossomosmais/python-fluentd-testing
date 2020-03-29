@@ -4,7 +4,7 @@
 
 Commands:
 
-    kubectl create -f kube-logging.yaml
+    kubectl create -f namespaces.yaml
     kubectl create -f elasticsearch-statefulset.yaml 
 
 Warnings I saw issuing the command `kubectl get events -w -n kube-logging`:
@@ -65,7 +65,7 @@ Now in another terminal:
 
 ## Deploying Kibana
 
-    kubectl create -f kube-logging.yaml
+    kubectl create -f kibana-deployment.yaml
     kubectl rollout status deployment/kibana --namespace=kube-logging
     
 ### Testing your setup
@@ -86,9 +86,21 @@ Here I'm using a local App which was built in docker-compose. I even translated 
 
     kubectl create configmap sample-api-configmap --from-env-file=.env-prd -n=development
     kubectl get configmap sample-api-configmap -o yaml -n=development
-    kubectl create sample-api-pod.yaml
 
 It's important to point out your App as we don't have for now a public application which can be used for this test.
+
+Sample recipes that you can use to your tests:
+
+- [sample-api-dev-deployment.yaml](./sample-api-dev-deployment.yaml)
+- [sample-api-prd-deployment.yaml](./sample-api-prd-deployment.yaml)
+
+## How to change fluentd config
+
+I configured a custom [kubernetes.conf](./kubernetes.conf) (I get it from [here](https://github.com/fluent/fluentd-kubernetes-daemonset/blob/04122c95689ad2e7b106023b9e4b9894f2ab6426/docker-image/v1.9/debian-elasticsearch7/conf/kubernetes.conf)) that sends only messages which is originated from `production` namespace. Beyond that there is a filter that parses what is contained in `log` key to `json`, I believe that's better than `json_in_json` plugin. To create a `configmap` from it, do the following:
+
+    kubectl create configmap custom-fluentd-conf --from-file=kubernetes.conf --namespace=kube-logging
+
+You can see [custom-fluentd-daemonset.yaml](./custom-fluentd-daemonset.yaml) recipe which uses this setup.
 
 # Useful links
 
@@ -113,4 +125,3 @@ Configuration files used by default concerning this tutorial:
 
 - [Native configs files for v1.9.3-debian-elasticsearch7-1.0](https://github.com/fluent/fluentd-kubernetes-daemonset/tree/master/docker-image/v1.9/debian-elasticsearch7/conf)
 - [GitHub issue about json logs not parsing correctly](https://github.com/fluent/fluentd-kubernetes-daemonset/issues/324)
-
