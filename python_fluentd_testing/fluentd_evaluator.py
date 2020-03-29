@@ -7,10 +7,10 @@ from python_fluentd_testing.utils import delete_all_log_files_contained_in_the_f
 from python_fluentd_testing.utils import execute_shell_command
 from python_fluentd_testing.utils import execute_system_command_and_does_not_await_its_execution
 from python_fluentd_testing.utils import number_of_lines
-from python_fluentd_testing.utils import try_to_get_log_as_json
+from python_fluentd_testing.utils import try_to_get_last_line_as_json
 
 
-class EmitCommandCouldNotBeExecuted(Exception):
+class EmitCommandCouldNotBeExecutedProperly(Exception):
     pass
 
 
@@ -28,11 +28,14 @@ class FluentdEvaluator:
 
     def emit_it_and_get_computed_result(self, fake_log_data: Dict, tag=None, number_of_entries_in_output=1) -> Dict:
         self.emit_data(fake_log_data, tag, self.forward_port)
-        result = try_to_get_log_as_json(self.output_file_name)
+        result = try_to_get_last_line_as_json(self.output_file_name)
         if not result:
             raise NoOutputCouldBeExtractedException
         assert number_of_lines(self.output_file_name) == number_of_entries_in_output
         return result
+
+    def emit_it(self, fake_log_data: Dict, tag=None):
+        self.emit_data(fake_log_data, tag, self.forward_port)
 
     @contextmanager
     def initialize_fluent_daemon(self):
@@ -48,6 +51,8 @@ class FluentdEvaluator:
         stdout, stderr = execute_shell_command(command)
         # Give some time to commit the data
         sleep(1)
-        print(f"Result of STDOUT: {stdout}")
+        stdout = stdout.decode()
+        if stdout or stderr:
+            raise EmitCommandCouldNotBeExecutedProperly(f"Command error: {command}")
         if stderr:
-            raise EmitCommandCouldNotBeExecuted(f"Command error: {command}")
+            raise EmitCommandCouldNotBeExecutedProperly(f"Command error: {command}")

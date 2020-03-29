@@ -52,7 +52,7 @@ def delete_all_log_files_contained_in_the_folder(folder_path: str):
 def last_line_from_some_file(file: str) -> Optional[str]:
     with open(file, "r") as f:
         lines = f.read().splitlines()
-        return lines[-1]
+        return lines[-1] if lines else None
 
 
 def erase_file_content(file_location: str):
@@ -62,12 +62,12 @@ def erase_file_content(file_location: str):
             f.truncate(0)
 
 
-def try_to_get_log_as_json(file_location: str, max_tries=3, await_in_seconds_between_tries=1) -> Optional[dict]:
+def try_to_get_last_line_as_json(file_location: str, max_tries=3, await_in_seconds_between_tries=1) -> Optional[dict]:
     attempts = 0
     while True:
         line = last_line_from_some_file(file_location)
-        line_as_json: dict = json.loads(line)
-        if line_as_json.get("log"):
+        line_as_json = json.loads(line) if line else None
+        if line_as_json:
             return line_as_json
         if attempts >= max_tries:
             return
