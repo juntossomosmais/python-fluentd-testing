@@ -9,18 +9,17 @@ from typing import Optional
 
 
 def execute_shell_command(commands_list: List[str]):
-    commands_list = " ".join(commands_list)
-    output = subprocess.Popen(commands_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+    built_command = " ".join(commands_list)
+    output = subprocess.Popen(built_command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     stdout, stderr = output.communicate()
     return stdout, stderr
 
 
 @contextmanager
 def execute_system_command_and_does_not_await_its_execution(commands_list: List[str]):
-    global process
-    commands_list = " ".join(commands_list)
+    built_command = " ".join(commands_list)
     try:
-        process = subprocess.Popen(commands_list, shell=True)
+        process = subprocess.Popen(built_command, shell=True)
         sleep(7)
         yield
     finally:
@@ -70,6 +69,6 @@ def try_to_get_last_line_as_json(file_location: str, max_tries=3, await_in_secon
         if line_as_json:
             return line_as_json
         if attempts >= max_tries:
-            return
+            return None
         sleep(await_in_seconds_between_tries)
         attempts += 1

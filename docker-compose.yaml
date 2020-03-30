@@ -18,3 +18,12 @@ services:
       - ./tests/resources/fluentd-setup/result:/result
     command: >
       sh -c "pip3 install tox && python3 -m tox"
+  lint:
+    image: ricardobchaves6/python-lint-image
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: >
+      sh -c "isort -rc python_fluentd_testing tests -c --diff \
+        && black --check --diff python_fluentd_testing tests \
+        && mypy python_fluentd_testing tests"

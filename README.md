@@ -14,6 +14,12 @@ Simply execute the following command:
 
     docker-compose up integration-tests
 
+## Run lint evaluation locally
+
+We have a service for this as well:
+
+    docker-compose up lint
+
 ## Testing with your K8S
 
 After you test your configuration, you can proceed to apply your setup to your production environment. Now if you are in a phase where you would like to see if your configuration run in your real environment, like K8S, then you need to do a full manual process.
