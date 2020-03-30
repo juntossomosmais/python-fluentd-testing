@@ -16,6 +16,3 @@ jobs:
           use-pylint: false
           use-flake8: false
           extra-black-options: "--diff"
-          extra-pycodestyle-options: ""
-          extra-flake8-options: ""
-          extra-mypy-options: ""
