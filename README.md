@@ -1,5 +1,9 @@
 # Python Fluentd Testing
 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![Integration tests status](https://github.com/juntossomosmais/python-fluentd-testing/workflows/Integration%20tests/badge.svg)
+![Lint rules status](https://github.com/juntossomosmais/python-fluentd-testing/workflows/Lint%20rules/badge.svg)
+
 Tired of testing fluentd and wasting lots of your precious time with manual integration tests? How about the lag it causes to your machine?
 
 Now you can easily test your configuration with this project!
