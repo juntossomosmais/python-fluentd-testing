@@ -20,7 +20,7 @@ def execute_system_command_and_does_not_await_its_execution(commands_list: List[
     built_command = " ".join(commands_list)
     try:
         process = subprocess.Popen(built_command, shell=True)
-        sleep(7)
+        sleep(8)
         yield
     finally:
         process.kill()
