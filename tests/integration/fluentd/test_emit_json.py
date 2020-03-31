@@ -27,6 +27,14 @@ def setup_fluentd_scenario_3():
         yield f_evaluator
 
 
+@pytest.fixture
+def setup_fluentd_scenario_4():
+    folder_location, abs_file_path = absolute_path_fluentd_output_file("fluentd-test-output-4.log")
+    fluentd_evaluator = FluentdEvaluator("fluent-4.conf", folder_location, abs_file_path, 24227)
+    with fluentd_evaluator.initialize_fluent_daemon() as f_evaluator:
+        yield f_evaluator
+
+
 def test_should_emit_and_check_if_log_matches(setup_fluentd_scenario_1):
     emitted = {"log": "jafar"}
 
@@ -95,3 +103,21 @@ def test_should_emit_only_message_with_production_namespace(setup_fluentd_scenar
 
     same_as_message_2 = try_to_remove_key_otherwise_return_it(result, "date", "tag")
     assert message_2 == same_as_message_2
+
+
+def test_should_emit_and_delete_some_keys(setup_fluentd_scenario_4):
+    message = {
+        "levelname": "INFO",
+        "name": "chumaco.services.bear",
+        "message": "QA LOREM IPSUM DOLOR SIT AMET",
+        "kubernetes": {"container_name": "chumaco", "namespace_name": "qa", "something": "delete-me"},
+    }
+
+    result = setup_fluentd_scenario_4.emit_it_and_get_computed_result(message)
+
+    assert result.get("date") is not None
+    assert result.get("tag") is not None
+
+    cleaned_result = try_to_remove_key_otherwise_return_it(result, "date", "tag")
+    del message["kubernetes"]["something"]
+    assert cleaned_result == message
