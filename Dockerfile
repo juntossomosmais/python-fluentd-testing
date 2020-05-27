@@ -1,4 +1,4 @@
-FROM fluent/fluentd:v1.10-debian-1
+FROM fluent/fluentd:v1.10.4-debian-1.0
 
 USER root
 
@@ -10,10 +10,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install wheel && pip3 install pipenv
+RUN pip3 install --no-cache-dir wheel pipenv
 
 WORKDIR /app
-COPY Pipfile /app
-COPY Pipfile.lock /app
 
-RUN pipenv install --system --deploy --dev --ignore-pipfile
+COPY Pipfile Pipfile.lock ./
+
+RUN pipenv install --system --deploy --dev --ignore-pipfile && pip3 uninstall --yes pipenv
+
+RUN rm Pipfile Pipfile.lock
