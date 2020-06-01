@@ -45,6 +45,14 @@ def setup_fluentd_scenario_5():
         yield f_evaluator
 
 
+@pytest.fixture
+def setup_fluentd_scenario_6():
+    folder_location, abs_file_path = absolute_path_fluentd_output_file("fluentd-test-output-6.log")
+    fluentd_evaluator = FluentdEvaluator("fluent-6.conf", folder_location, abs_file_path, 24229)
+    with fluentd_evaluator.initialize_fluent_daemon() as f_evaluator:
+        yield f_evaluator
+
+
 def test_should_emit_and_check_if_log_matches(setup_fluentd_scenario_1):
     emitted = {"log": "jafar"}
 
@@ -179,3 +187,76 @@ def test_should_not_accept_health_check(setup_fluentd_scenario_5):
     del message_2["kubernetes"]["master_url"]
     del message_2["kubernetes"]["namespace_id"]
     assert cleaned_result == message_2
+
+
+def test_should_accept_message_only_if_key_contains_certain_value(setup_fluentd_scenario_6):
+    message_1 = {
+        "log": '{"levelname": "INFO", "asctime": "2020-04-24 19:00:49,878", "request_id": "646e161e-5f98-43a3-a369-693c0112999a", "name": "gunicorn.access", "message": "POST /healthcheck HTTP/1.1", "http_status": 200, "ip_address": "10.130.81.220", "response_length": "3", "referer": "-", "user_agent": "kube-probe/1.14+", "request_time": 0.000896, "date": "[24/Apr/2020:19:00:49 -0300]"}',
+        "stream": "stderr",
+        "docker": {"container_id": "b486c8e1725ae522953b6eb5df7ac0a3e0a8316912ab682f7804af6df2302ae9"},
+        "kubernetes": {
+            "container_image": "quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.32.0",
+            "namespace_name": "production",
+            "pod_name": "chumaco-deployment-5bdd6d6d58-chq95",
+            "pod_id": "ebe5ff7c-70ad-11ea-b1ce-02c121ebda79",
+            "labels": {
+                "app": "chumaco",
+                "pod-template-hash": "5bdd6d6d58",
+                "app_kubernetes_io/name": "ingress-nginx-public-apps-ingress",
+            },
+            "host": "ip-127-0-0-2.ec2.internal",
+            "master_url": "https://127.0.0.1:443/api",
+            "namespace_id": "c02f189a-9f2a-11e9-879d-0ad999a381fc",
+        },
+        "@timestamp": "2020-04-24T22:00:50.742098210+00:00",
+    }
+    message_2 = {
+        "log": '{"levelname": "INFO", "asctime": "2020-04-24 19:00:49,878", "request_id": "646e161e-5f98-43a3-a369-693c0112999a", "name": "gunicorn.access", "message": "POST /healthcheck HTTP/1.1", "http_status": 200, "ip_address": "10.130.81.220", "response_length": "3", "referer": "-", "user_agent": "kube-probe/1.14+", "request_time": 0.000896, "date": "[24/Apr/2020:19:00:49 -0300]"}',
+        "stream": "stderr",
+        "docker": {"container_id": "b486c8e1725ae522953b6eb5df7ac0a3e0a8316912ab682f7804af6df2302ae9"},
+        "kubernetes": {
+            "container_image": "952838399835.dkr.ecr.us-east-1.amazonaws.com/yuntiandu:14752-a1ba5719e7ae1c32b0e2c8117884d6177ce2a18b",
+            "namespace_name": "production",
+            "pod_name": "chumaco-deployment-5bdd6d6d58-chq95",
+            "pod_id": "ebe5ff7c-70ad-11ea-b1ce-02c121ebda79",
+            "labels": {
+                "app": "chumaco",
+                "pod-template-hash": "5bdd6d6d58",
+                "app_kubernetes_io/name": "ingress-nginx-public-apps-ingress",
+            },
+            "host": "ip-127-0-0-2.ec2.internal",
+            "master_url": "https://127.0.0.1:443/api",
+            "namespace_id": "c02f189a-9f2a-11e9-879d-0ad999a381fc",
+        },
+        "@timestamp": "2020-04-24T22:00:50.742098210+00:00",
+    }
+    message_3 = {
+        "log": '{"levelname": "INFO", "asctime": "2020-04-24 19:00:49,878", "request_id": "646e161e-5f98-43a3-a369-693c0112999a", "name": "gunicorn.access", "message": "POST /healthcheck HTTP/1.1", "http_status": 200, "ip_address": "10.130.81.220", "response_length": "3", "referer": "-", "user_agent": "kube-probe/1.14+", "request_time": 0.000896, "date": "[24/Apr/2020:19:00:49 -0300]"}',
+        "stream": "stderr",
+        "docker": {"container_id": "b486c8e1725ae522953b6eb5df7ac0a3e0a8316912ab682f7804af6df2302ae9"},
+        "kubernetes": {
+            "container_image": "952838399835.dkr.ecr.us-east-1.amazonaws.com/yuntiandu:14752-a1ba5719e7ae1c32b0e2c8117884d6177ce2a18b",
+            "namespace_name": "production",
+            "pod_name": "chumaco-deployment-5bdd6d6d58-chq95",
+            "pod_id": "ebe5ff7c-70ad-11ea-b1ce-02c121ebda79",
+            "labels": {"app": "chumaco", "pod-template-hash": "5bdd6d6d58"},
+            "host": "ip-127-0-0-2.ec2.internal",
+            "master_url": "https://127.0.0.1:443/api",
+            "namespace_id": "c02f189a-9f2a-11e9-879d-0ad999a381fc",
+        },
+        "@timestamp": "2020-04-24T22:00:50.742098210+00:00",
+    }
+
+    setup_fluentd_scenario_6.emit_it(message_1)
+    setup_fluentd_scenario_6.emit_it(message_2)
+    result = setup_fluentd_scenario_6.emit_it_and_get_computed_result(message_3)
+
+    assert result.get("date") is not None
+    assert result.get("tag") is not None
+
+    cleaned_result = try_to_remove_key_otherwise_return_it(result, "date", "tag")
+
+    message_3["application"] = json.loads(message_3["log"])
+    del message_3["kubernetes"]["master_url"]
+    del message_3["kubernetes"]["namespace_id"]
+    assert cleaned_result == message_3
