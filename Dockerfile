@@ -22,3 +22,7 @@ COPY Pipfile Pipfile.lock ./
 RUN pipenv install --system --deploy --dev --ignore-pipfile
 
 RUN rm Pipfile Pipfile.lock
+
+# Leaving this just as an example for you!
+# https://docs.fluentd.org/deployment/plugin-management#fluent-gem
+RUN fluent-gem install fluent-plugin-dynatrace
