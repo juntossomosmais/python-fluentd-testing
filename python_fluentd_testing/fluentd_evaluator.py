@@ -1,7 +1,8 @@
 import json
 from contextlib import contextmanager
 from time import sleep
-from typing import Dict
+
+import requests
 
 from python_fluentd_testing.utils import delete_all_log_files_contained_in_the_folder
 from python_fluentd_testing.utils import execute_shell_command
@@ -26,16 +27,29 @@ class FluentdEvaluator:
         self.forward_port = forward_port
         delete_all_log_files_contained_in_the_folder(self.folder_logs)
 
-    def emit_it_and_get_computed_result(self, fake_log_data: Dict, tag=None, number_of_entries_in_output=1) -> Dict:
-        self.emit_data(fake_log_data, tag, self.forward_port)
+    def emit_it_through_http_post_and_get_computed_result(
+        self, fake_log_data: dict, tag="jsm.testing", number_of_entries_in_output=1
+    ) -> dict:
+        response = requests.post(f"http://localhost:{self.forward_port}/{tag}", json=fake_log_data)
+        assert response.status_code == 200
         result = try_to_get_last_line_as_json(self.output_file_name)
         if not result:
             raise NoOutputCouldBeExtractedException
         assert number_of_lines(self.output_file_name) == number_of_entries_in_output
         return result
 
-    def emit_it(self, fake_log_data: Dict, tag=None):
-        self.emit_data(fake_log_data, tag, self.forward_port)
+    def emit_it_and_get_computed_result(
+        self, fake_log_data: dict, tag="jsm.testing", number_of_entries_in_output=1
+    ) -> dict:
+        self.emit_data_fluent_cat(fake_log_data, tag, self.forward_port)
+        result = try_to_get_last_line_as_json(self.output_file_name)
+        if not result:
+            raise NoOutputCouldBeExtractedException
+        assert number_of_lines(self.output_file_name) == number_of_entries_in_output
+        return result
+
+    def emit_it(self, fake_log_data: dict, tag="jsm.testing"):
+        self.emit_data_fluent_cat(fake_log_data, tag, self.forward_port)
 
     @contextmanager
     def initialize_fluent_daemon(self):
@@ -44,8 +58,7 @@ class FluentdEvaluator:
             yield self
 
     @staticmethod
-    def emit_data(fake_log_data, tag=None, forward_port=24224):
-        tag = tag if tag else "jsm.testing"
+    def emit_data_fluent_cat(fake_log_data, tag, forward_port=24224):
         send_to_fluentd_as_text = json.dumps(fake_log_data)
         command = ["echo", f"'{send_to_fluentd_as_text}'", "|", "fluent-cat", "-p", str(forward_port), tag]
         stdout, stderr = execute_shell_command(command)

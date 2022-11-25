@@ -2,6 +2,7 @@ import re
 from datetime import date
 
 import pytest
+
 from python_fluentd_testing.fluentd_evaluator import FluentdEvaluator
 from python_fluentd_testing.utils import delete_all_log_files_contained_in_the_folder
 from python_fluentd_testing.utils import erase_file_content
@@ -24,7 +25,7 @@ def test_should_emit_data(run_fluentd_1):
     abs_file_path = run_fluentd_1
     sample_fake_log = {"log": "jafar"}
     tag = "jsm.something"
-    FluentdEvaluator.emit_data(sample_fake_log, tag)
+    FluentdEvaluator.emit_data_fluent_cat(sample_fake_log, tag)
 
     result = try_to_get_last_line_as_json(abs_file_path)
     assert result is not None
