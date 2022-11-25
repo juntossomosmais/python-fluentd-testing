@@ -24,5 +24,9 @@ RUN pipenv install --system --deploy --dev --ignore-pipfile
 RUN rm Pipfile Pipfile.lock
 
 # Leaving this just as an example for you!
+# https://docs.fluentd.org/output/rewrite_tag_filter#installation
+RUN fluent-gem install fluent-plugin-rewrite-tag-filter
 # https://docs.fluentd.org/deployment/plugin-management#fluent-gem
 RUN fluent-gem install fluent-plugin-dynatrace
+RUN fluent-gem install fluent-plugin-split-array
+RUN fluent-gem install fluent-plugin-record-modifier --no-document
