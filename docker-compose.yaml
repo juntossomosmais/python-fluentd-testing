@@ -1,16 +1,19 @@
-version: "2.4"
+version: "3.8"
+
+x-build: &dockerfile-dev-build
+  context: .
+  dockerfile: Dockerfile
+
 services:
   remote-interpreter:
-    build:
-      context: .
+    build: *dockerfile-dev-build
     working_dir: /app
     volumes:
       - .:/app
       - ./tests/resources/fluentd-setup/fluentd/etc:/fluentd/etc
       - ./tests/resources/fluentd-setup/result:/result
   integration-tests:
-    build:
-      context: .
+    build: *dockerfile-dev-build
     working_dir: /app
     volumes:
       - .:/app
@@ -18,12 +21,8 @@ services:
       - ./tests/resources/fluentd-setup/result:/result
     command: >
       sh -c "pip3 install tox && python3 -m tox"
-  lint:
-    image: ricardobchaves6/python-lint-image
-    working_dir: /app
+  lint-formatter:
+    build: *dockerfile-dev-build
     volumes:
       - .:/app
-    command: >
-      sh -c "isort -rc python_fluentd_testing tests -c --diff \
-        && black --check --diff python_fluentd_testing tests \
-        && mypy python_fluentd_testing tests"
+    command: ["./scripts/start-formatter-lint.sh"]

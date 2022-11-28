@@ -1,18 +1,20 @@
-name: Lint rules
-on: [pull_request]
+name: Lint
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+    paths-ignore:
+      - '**/README.md'
+      - 'scripts/**'
+      - 'sonar-project.properties'
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: ricardochaves/python-lint@v1.1.0
-        with:
-          python-root-list: "python_fluentd_testing tests"
-          use-black: true
-          use-mypy: true
-          use-isort: true
-          use-pycodestyle: false
-          use-pylint: false
-          use-flake8: false
-          extra-black-options: "--diff"
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Lint evaluation
+        run: docker-compose up --exit-code-from lint-formatter lint-formatter
