@@ -1,6 +1,7 @@
 import json
 
 import pytest
+
 from python_fluentd_testing.fluentd_evaluator import FluentdEvaluator
 from tests.resources.support import absolute_path_fluentd_output_file
 from tests.resources.support import try_to_remove_key_otherwise_return_it
@@ -104,13 +105,19 @@ def test_should_emit_only_message_with_production_namespace(setup_fluentd_scenar
         "levelname": "INFO",
         "name": "chumaco.services.bear",
         "message": "QA LOREM IPSUM DOLOR SIT AMET",
-        "kubernetes": {"container_name": "chumaco", "namespace_name": "qa",},
+        "kubernetes": {
+            "container_name": "chumaco",
+            "namespace_name": "qa",
+        },
     }
     message_2 = {
         "levelname": "INFO",
         "name": "chumaco.services.bear",
         "message": "PRD LOREM IPSUM DOLOR SIT AMET",
-        "kubernetes": {"container_name": "chumaco", "namespace_name": "production",},
+        "kubernetes": {
+            "container_name": "chumaco",
+            "namespace_name": "production",
+        },
     }
 
     setup_fluentd_scenario_3.emit_it(message_1)

@@ -6,8 +6,10 @@ verify_ssl = true
 [dev-packages]
 pytest = "*"
 faker = "*"
+pre-commit = "*"
 
 [packages]
+requests = "*"
 
 [requires]
 python_version = "3.9"
