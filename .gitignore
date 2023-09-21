@@ -251,3 +251,6 @@ build-iPhoneSimulator/
 # .rubocop-https?--*
 
 # End of https://www.gitignore.io/api/ruby,python,intellij+all
+
+# Vim
+*.swp
