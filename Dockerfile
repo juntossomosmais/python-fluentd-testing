@@ -31,3 +31,5 @@ RUN fluent-gem install fluent-plugin-rewrite-tag-filter
 RUN fluent-gem install fluent-plugin-dynatrace
 RUN fluent-gem install fluent-plugin-split-array
 RUN fluent-gem install fluent-plugin-record-modifier --no-document
+
+RUN chown root:root .
