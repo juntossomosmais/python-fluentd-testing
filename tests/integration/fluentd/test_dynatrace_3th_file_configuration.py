@@ -58,7 +58,7 @@ def test_should_emit_and_transform_content_and_body_keys_to_send_to_dynatrace(se
     expected_namespace = f'{auth0_event["strategy"]}|{auth0_event["strategy_type"]}|{auth0_event["connection"]}'
     assert cleaned_result == {
         "content": "Wrong email or password.",
-        "body": {
+        "data.detail": {
             "error": {"message": "Wrong email or password."},
             "request": {"method": "requestOptions", "path": "requestOptions"},
             "response": {"body": "httpResponseBody", "statusCode": "httpResponseStatusCode"},
